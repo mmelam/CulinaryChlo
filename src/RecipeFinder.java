@@ -1,16 +1,19 @@
-//import java.io.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Random;
 
  class RecipeFinder{
 	
-	Recipe recArr[] = new Recipe[100];
-	Recipe viewedArr[] = new Recipe[100];
+	Recipe recArr[];
 	Recipe selected;
 	Recipe last;
 	int i=0;
+	boolean rand = false;
+	int next = 0;
+	String storeCulture;
+	String storeMeat;
 	
 	public RecipeFinder()
 	{	
@@ -21,9 +24,13 @@ import java.io.IOException;
 			int index = 0;
 			String culture = null;
 			String meat = null;
-			String meal = null;
 			String url = null;
 			String reason = null;
+			
+			String len = br.readLine();
+			int arrLen = Integer.parseInt(len);
+			recArr = new Recipe[arrLen];
+			
 			while( br.ready() )
 			{
 				if(i==1)
@@ -40,21 +47,15 @@ import java.io.IOException;
 				}
 				else if(i==3)
 				{
-					meal = br.readLine();
-					System.out.println(meal);
-					i++;
-				}
-				else if(i==4)
-				{
 					url = br.readLine();
 					System.out.println(url);
 					i++;
 				}
-				else if(i==5)
+				else if(i==4)
 				{
 					reason = br.readLine();
 					System.out.println(reason);
-					Recipe temp = new Recipe(culture, meal, meat, url, reason);
+					Recipe temp = new Recipe(culture, meat, url, reason, false);
 					recArr[index] = temp;
 					index++;
 					i = 1;
@@ -69,41 +70,76 @@ import java.io.IOException;
 		}
 	}
 	
-	public void findRecipe(String culture, String meat, String meal)
+	public void findRecipe(String culture, String meat)
 	{
 		int index = 0;
 		boolean found = false;
+		storeCulture = culture;
+		storeMeat = meat;
+		System.out.println(next);
+		
+		if(next != 0)
+		{
+			index = next;
+		}
 		while(found == false)
 		{	
-			if((recArr[index].culture.equals(culture))&&(recArr[index].meal.equals(meal))&&(recArr[index].meat.equals(meat))&&(viewedCheck(recArr[index])==false))
+			if((recArr[index].culture.equals(culture))&&(recArr[index].meat.equals(meat))&&(recArr[index].saved == false))
 			{
-				selected = recArr[i];
+				selected = recArr[index];
 				found = true;
-				int j=0;
-				while(viewedArr[j]!=null)
-				{
-					j++;
-				}
-				viewedArr[j] = selected;
-
-			}
-			else if(recArr[index]==null)
-			{
 				
+				if(index+1 == recArr.length)
+				{
+					next = 0;
+				}
+				else{
+					next = index++;
+				}
+			}
+			else if(index+1 == recArr.length)
+			{
+				next = 0;
 			}
 			else{
-				System.out.println("here");
-				//found = true;
-				index++;
+				next = index++;
 			}
 		}
 	}
-	
+		
 	public void getNext()
 	{
-		//if(recArr[])
-		i = i+1;
-		selected = recArr[i];
+		if(rand == true)
+		{
+			randomRecipe();
+		}
+		else{
+			findRecipe(storeCulture, storeMeat);
+		}
+	}
+	
+	public void randomRecipe()
+	{
+		rand = true;
+		int len = recArr.length;
+		Random rn = new Random();
+		int randomNum = rn.nextInt(len);
+		System.out.println(randomNum);
+		
+		if(recArr[randomNum] == last)
+		{
+			if(randomNum+1 == len)
+			{
+				selected = recArr[0];
+			}
+			else{
+				selected = recArr[randomNum+1];
+			}
+		}
+		else{
+			selected = recArr[randomNum];
+		}
+		last = selected;
 	}
 	
 	public String getReason()
@@ -116,16 +152,4 @@ import java.io.IOException;
 		return selected.url;
 	}
 	
-	public boolean viewedCheck(Recipe rec)
-	{
-		int j=0;
-		while(viewedArr[j]!=null)
-		{
-			if(viewedArr[j].equals(rec))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
 }

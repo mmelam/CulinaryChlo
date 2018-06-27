@@ -1,5 +1,6 @@
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.event.*;
 import java.io.*;
 
@@ -12,48 +13,68 @@ public class Interface implements ActionListener {
   	private JButton home = new JButton("Home");
   	private JButton back = new JButton("Back");
   	private JButton next = new JButton("Next Recipe");
+  	private JButton surprise = new JButton("Surprise Me!");
+  	
+  	// check box
+  	private JCheckBox saveCheck = new JCheckBox("Mark as used"){
+  		@Override public void setBorder(Border border){
+  		}
+  	};
   		
   	// combo boxes
-  	String culture[] = {"Asian", "Italian", "Indian", "Mediterranean", "Mexican", "Other"};
-  	String meal[] = {"Breakfast", "Lunchie", "Dinner", "Dessert"};
-  	String meat[] = {"Beef", "Chicken", "Pork", "Seafood", "Other","None"};
+  	String culture[] = {"-", "Asian", "Italian", "Indian", "Mediterranean", "Mexican", "Other", "Random"};
+  	String meat[] = {"-", "Beef", "Chicken", "Pork", "Seafood", "Other","None","Random"};
   	private JComboBox cultureSel = new JComboBox(culture);
-  	private JComboBox mealSel = new JComboBox(meal);
   	private JComboBox meatSel = new JComboBox(meat);
   	
   	// labels
   	JLabel title = new JLabel("Culinary Chlo");
-  	JLabel description = new JLabel("Temp Title"); //("Hand Selected Recipes for my Favorite Foodie. I love you!");
+  	JLabel description = new JLabel("Hand Selected Recipes for my Favorite Foodie. I love you!");
   	JLabel options = new JLabel("Choose your Options: ");
   	JLabel spacer1 = new JLabel(" ");
   	JLabel spacer2 = new JLabel(" ");
   	JLabel spacer3 = new JLabel(" ");
   	JLabel spacer4 = new JLabel(" ");
+  	JLabel spacer5 = new JLabel(" ");
   	JLabel recTitle = new JLabel("Get Cooking!");
   	JLabel recipeSite = new JLabel("Recipe Link:");
   	
   	// text areas
-  	private JTextField url = new JTextField();
-  	private JTextField reason = new JTextField();
+  	private JTextField url = new JTextField(){
+  		@Override public void setBorder(Border border){
+  		}
+  	};
+  	private JTextField reason = new JTextField(){
+  		@Override public void setBorder(Border border){
+  		}
+  	};
   	
     public void addComponentToPane(Container pane) {
         run.addActionListener(this);
         home.addActionListener(this);
         back.addActionListener(this);
         next.addActionListener(this);
+        saveCheck.addActionListener(this);
         
         title.setFont(new Font("Snell Roundhand", Font.ITALIC, 48));
         recTitle.setFont(new Font("Snell Roundhand", Font.ITALIC, 40));
       	cultureSel.setPreferredSize(new Dimension(83,20));
-      	mealSel.setPreferredSize(new Dimension(83,20));
       	meatSel.setPreferredSize(new Dimension(83,20));
       	home.setPreferredSize(new Dimension(120,20));
       	next.setPreferredSize(new Dimension(120,20));
-        
+      	
+      	reason.setBackground(new Color(255,216,254));
+      	url.setBackground(new Color(255,216,254));
+      	saveCheck.setBackground(new Color(255,216,254));
+      	
+      	// Tab Pane
+      	JTabbedPane appTab = new JTabbedPane();
+      	
         ///////// 
         // Main Panel 
         /////////
         JPanel mainPanel = new JPanel(new GridBagLayout());
+        appTab.add("Home", mainPanel);
         mainPanel.setBackground(new Color(255,216,254));
         GridBagConstraints gc = new GridBagConstraints();
         gc.gridx = 0;
@@ -77,21 +98,17 @@ public class Interface implements ActionListener {
 		gc.gridx = 0;
 		gc.gridy = 4;
 		gc.anchor = GridBagConstraints.WEST;
-		mainPanel.add(mealSel, gc);
+		mainPanel.add(meatSel, gc);
 		gc.gridx = 0;
 		gc.gridy = 5;
 		gc.anchor = GridBagConstraints.WEST;
-		mainPanel.add(meatSel, gc);
+		mainPanel.add(cultureSel, gc);	
 		gc.gridx = 0;
 		gc.gridy = 6;
 		gc.anchor = GridBagConstraints.WEST;
-		mainPanel.add(cultureSel, gc);	
-		gc.gridx = 0;
-		gc.gridy = 7;
-		gc.anchor = GridBagConstraints.WEST;
 		mainPanel.add(spacer2, gc);
 		gc.gridx = 0;
-		gc.gridy = 8;
+		gc.gridy = 7;
 		gc.anchor = GridBagConstraints.WEST;
 		mainPanel.add(run, gc);
 		
@@ -128,39 +145,61 @@ public class Interface implements ActionListener {
 		gc.gridx = 0;
 		gc.gridy = 6;
 		gc.anchor = GridBagConstraints.WEST;
-		recipePanel.add(next, gc);
+		recipePanel.add(saveCheck, gc);
 		gc.gridx = 0;
 		gc.gridy = 7;
 		gc.anchor = GridBagConstraints.WEST;
+		recipePanel.add(spacer5, gc);
+		gc.gridx = 0;
+		gc.gridy = 8;
+		gc.anchor = GridBagConstraints.WEST;
+		recipePanel.add(next, gc);
+		gc.gridx = 0;
+		gc.gridy = 9;
+		gc.anchor = GridBagConstraints.WEST;
 		recipePanel.add(home, gc);
-        
+		
+		// Saved Panel
+		JPanel savedPanel = new JPanel(new GridBagLayout());
+		appTab.add("Saved Recipes", savedPanel);
+		savedPanel.setBackground(new Color(255,216,254));
          
         //Create the panel that contains the "cards".
         cards = new JPanel(new CardLayout());
-        cards.add(mainPanel, "main");
+        cards.add(appTab, "main");
         cards.add(recipePanel, "recipe");
          
-        //pane.add(comboBoxPane, BorderLayout.PAGE_START);
         pane.add(cards, BorderLayout.NORTH);
     }
     
+    RecipeFinder newRecipe = new RecipeFinder();
     public void actionPerformed(ActionEvent e)
     {
     	CardLayout cl = (CardLayout)(cards.getLayout());
     	String type = String.valueOf(cultureSel.getSelectedItem());
 		String meatGo = String.valueOf(meatSel.getSelectedItem());
-		String mealGo = String.valueOf(mealSel.getSelectedItem());
-		RecipeFinder newRecipe = new RecipeFinder();
-		
-		System.out.println(meatGo);
-		System.out.println(mealGo);
-    	
+		String str = "-";
+		String rand = "Random";
+
     	if(e.getSource() == run)
     	{
-    		newRecipe.findRecipe(type, meatGo, mealGo);
-    		reason.setText(newRecipe.getReason());
-    		url.setText(newRecipe.getURL());
-    		cl.show(cards, "recipe");
+    		if(type.equals(str) || meatGo.equals(str))
+    		{
+    			JOptionPane.showMessageDialog(null, "Silly Chlo... please make selections for both options!", "Error", JOptionPane.ERROR_MESSAGE);
+    		}
+    		else if(type.equals(rand) && meatGo.equals(rand))
+    		{
+    			newRecipe.randomRecipe();
+    			reason.setText(newRecipe.getReason());
+    			url.setText(newRecipe.getURL());
+        		cl.show(cards, "recipe");
+    		}
+    		else{
+    			newRecipe.findRecipe(type, meatGo);
+        		reason.setText(newRecipe.getReason());
+        		url.setText(newRecipe.getURL());
+        		cl.show(cards, "recipe");
+    		}
     	}
     	else if(e.getSource() == home)
     	{
@@ -171,6 +210,15 @@ public class Interface implements ActionListener {
     		newRecipe.getNext();
     		reason.setText(newRecipe.getReason());
     		url.setText(newRecipe.getURL());
+    	}
+    	else if(e.getSource() == surprise)
+    	{
+    		newRecipe.randomRecipe();
+    		cl.show(cards, "recipe");
+    	}
+    	else if(e.getSource() == saveCheck)
+    	{
+    		JOptionPane.showMessageDialog(null, "Recipe will be saved.\nIt can be viewed in the Saved Recipes tab.\nUncheck the box to undo.", "", JOptionPane.INFORMATION_MESSAGE);
     	}
     }
      
